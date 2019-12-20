@@ -12,7 +12,7 @@ void draw() {
   drawFace(x, y);
 }
 
-void drawFace(float x,float y){  //(x, y) is center of a ellipse
+void drawFace(float x, float y){  //(x, y) is center of a ellipse
     ellipse(x, y, 100, 80);
     fill(0);
     ellipse(x - 20, y - 10, 3, 3);
