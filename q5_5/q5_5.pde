@@ -5,12 +5,13 @@ void setup() {
   x = 3;
 }
 
-float y,x;
+float y;
 float vy;
-
+float x;
 void draw() {
   y += vy;
   vy += 0.3;
+  x += 2;
   background(0);
-  ellipse(sqrt(y), y, 20, 20);
+  ellipse(x, y, 20, 20);
 }
