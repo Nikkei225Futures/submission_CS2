@@ -4,7 +4,7 @@ void setup() {
 
 void draw() {
   if ((mouseX < 100 && mouseY > 100) ||
-      (mouseX > 100 && mouseX < 200 && mouseY >40) ||
+      (mouseX >= 100 && mouseX <= 200 && mouseY >40) ||
       (mouseX > 200 && mouseY > 120)) {  
       background(10, 180, 255);
   } else {
