@@ -5,11 +5,13 @@
  leverage = 100x
  order is available up to 5
  1 lot = 100,000USD
+ my programm is 633/1256 lines
+ json methods arent available in processing.js, so i using same-functional method which other created
  */
 //for getting datas from rest api
 final String api_key = "48db3546e09e037c829ce0507b4da944-0e75d408b9e2bb35a1e98a3409506871";
 final String accID = "101-001-12970645-001";
-String currency_pair = "GBP_JPY";
+String currency_pair = "USD_JPY";
 String granularity = "M1";
 String num_candles = "90";
 //
@@ -37,8 +39,8 @@ ArrayList<Float> lows   = new ArrayList();
 ArrayList<Float> closes = new ArrayList();
 float price_per_px, center;
 
-final int delay_time = 10;
-boolean server_stat;
+final int delay_time = 1000;
+String server_stat;
 float bid, ask, spread, ltp, balance = 1000000;
 ArrayList<Float> price_history = new ArrayList();
 ArrayList<String> time_history = new ArrayList<String>();
@@ -59,14 +61,15 @@ void setup() {
 void getCandles() {
   int i, j;
   String urls = "curl -H \"Authorization: Bearer " + api_key + "\" \"" + "https://api-fxpractice.oanda.com/v3/accounts/" + accID + "/instruments/" + currency_pair + "/candles?granularity=" + granularity + "&count=" + num_candles + "\"";
-  String outFile = " > /home/scinfo23/230373g/local_html/web-export/ohlc.json";
-  String ohlc_data = "/home/scinfo23/230373g/local_html/web-export/ohlc.json";
+  String outFile = " > ohlc.json";
+  String ohlc_data = "ohlc.json";
   String getOHLC = urls + outFile;
   JsonObject candle_datas = new JsonObject();
   JsonObject mid = new JsonObject();
   JsonObject tmp = new JsonObject();
   JsonArray candles = new JsonArray();
-  float open = 0, high = 0, low = 0, close = 0;
+  float open, high, low, close;
+  String opentmp, hightmp, lowtmp, closetmp;
 
   shell(strout, strerr, getOHLC);
 
@@ -78,10 +81,14 @@ void getCandles() {
   for (i = candles.Size() - 1, j = 0; i >= 0; i--, j++) {
     tmp = candles.GetJsonObject(i);
     mid = tmp.GetJsonObject("mid");
-    open = mid.GetFloat("o", open);
-    high = mid.GetFloat("h", high);
-    low = mid.GetFloat("l", low);
-    close = mid.GetFloat("c", close);
+    opentmp = mid.GetString("o", null);
+    hightmp = mid.GetString("h", null);
+    lowtmp = mid.GetString("l", null);
+    closetmp = mid.GetString("c", null);
+    open = float(opentmp);
+    high = float(hightmp);
+    low = float(lowtmp);
+    close = float(closetmp);
     //apiのOHLCは古い順から格納
     opens.add(j, open);
     highs.add(j, high);
@@ -157,9 +164,10 @@ void getMarketData() {
   JsonObject bidsary = new JsonObject(); 
   JsonObject asksary = new JsonObject();
   String urls = "curl -H \"Authorization: Bearer " + api_key + "\" \"" + "https://api-fxpractice.oanda.com/v3/accounts/" + accID + "/pricing?instruments=" + currency_pair + "\"";
-  String outFile = " > /home/scinfo23/230373g/local_html/web-export/ticker.json" ;
+  String outFile = " > ticker.json" ;
   String getPrice = urls + outFile;
-  String ticker = "/home/scinfo23/230373g/local_html/web-export/ticker.json";  // file name of ticker data
+  String ticker = "ticker.json";  // file name of ticker data
+  String bidtmp, asktmp;
   shell(strout, strerr, getPrice);
   market_data.Load(ticker);
   prices = market_data.GetJsonArray("prices");
@@ -172,16 +180,15 @@ void getMarketData() {
     asks = tmp.GetJsonArray("asks");
     bids = tmp.GetJsonArray("bids");
 
-    //get bid, ask
-    for (int j = 0; j < bids.Size(); j++) {
 
-      bidsary = bids.GetJsonObject(j);
-      asksary = asks.GetJsonObject(j);
-      bidsary.GetFloat("price", bid);
-      asksary.GetFloat("price", ask);
-    }
+    bidsary = bids.GetJsonObject(0);
+    asksary = asks.GetJsonObject(0);
+    bidtmp = bidsary.GetString("price", null);
+    asktmp = asksary.GetString("price", null);
+    bid = float(bidtmp);
+    ask = float(asktmp);
 
-    tmp.GetBoolean("tradeable", server_stat);
+    tmp.GetString("server_stat", null);
   }
 
   ltp = (bid + ask) / 2;
@@ -220,7 +227,7 @@ void getMarketData() {
   }
 
   price_history.add(0, ltp);
-  //time_history.add(0, time.substring(11, 22));
+  time_history.add(0, time.substring(11, 22));
 }
 
 void drawMarketData() {
@@ -267,16 +274,12 @@ void drawBidAskSpreadEtc() {
   textAlign(RIGHT, CENTER);
   text(spread, 320, 20);
   textAlign(RIGHT, TOP);
-  /*text("server time(UTC): " +
-   time.substring(0, 9) +
+  text("server time(UTC): " +
+   time.substring(0, 10) +
    "  " +
    time.substring(11, 22), 
    1590, 0);
-   */
-  //market closed or not
-  if (server_stat == false) {
-    server = "market closed, no orders available";
-  }
+   
 
   text("server stat: " + server, 1590, 30);
 
@@ -630,8 +633,7 @@ void mousePressed() {
   //when lot changed
 }
 
-
-
+//my programm end//
 /*
  OriginalJSONUtility
  Author : Gamu2059 (https://github.com/Gamu2059)
