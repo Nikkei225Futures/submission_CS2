@@ -32,7 +32,6 @@ void setup() {
   size(1900, 1010);
   getCandles();
   drawLayout();
-  noLoop();
 }
 
 void getCandles() {
@@ -47,7 +46,6 @@ void getCandles() {
   times   = loadStrings(dataDirectory + "times.txt");
   numCandles = Aopens.length;
 }
-
 
 void draw() {
   getMarketData();
@@ -254,11 +252,11 @@ void drawChart() {
   //search highest and lowest price in a chart
   lowest = 10000;
   highest = 0;
-  for(int i = nowCandle; i > nowCandle - 90; i--){
-    if(float(Bhighs[i]) >= highest){
+  for (int i = nowCandle; i > nowCandle - 90; i--) {
+    if (float(Bhighs[i]) >= highest) {
       highest = float(Bhighs[i]);
     }
-    if(float(Blows[i]) <= lowest){
+    if (float(Blows[i]) <= lowest) {
       lowest = float(Blows[i]);
     }
   }  
@@ -318,13 +316,13 @@ void drawChart() {
 
 void getPriceHeightPerPx() {  
   float price_range;
-  
-float highest = 0, lowest = 10000;
-  for(int i = nowCandle; i > nowCandle - 90; i--){
-    if(highest < float(Bhighs[i])){
+
+  float highest = 0, lowest = 10000;
+  for (int i = nowCandle; i > nowCandle - 90; i--) {
+    if (highest < float(Bhighs[i])) {
       highest = float(Bhighs[i]);
     }
-    if(lowest > float(Blows[i])){
+    if (lowest > float(Blows[i])) {
       lowest = float(Blows[i]);
     }
   }
@@ -338,138 +336,102 @@ float highest = 0, lowest = 10000;
 
 //click event
 void mousePressed() {
-  float margin_sum = 0.0;
   if (lot > 0 && num_order < 5) {  // when lot > 0 number of orders under 5
-
-    for (int i = 0; i <= margins.length - 1; i++) {
-      margin_sum += margins[i];
-    }
-
     if (mouseX >= 0 && mouseX <= 249 && mouseY >= 40 && mouseY <= 160 || mouseX >= 0 && mouseX <= 150 && mouseY >= 0 && mouseY <= 39) {    // when bid is pressed = sell
-      //margin is enough or not
-      if (equity - (margin_sum + (bid * lot * lot_size / leverage)) < 0) {
-        textAlign(LEFT, BOTTOM);
-        fill(230, 0, 0);
-        noStroke();
-        text("WARING: " + "margin isn't enough ", 200, 860);
-        fill(255);
-        return;
-      }
-
-      in_price[num_order] = bid;
-      margins[num_order] = bid * lot * lot_size / leverage;
-      BoS[num_order] = 1;
-      lots[num_order] = lot;
-      num_order ++;
-      drawLayout();
-      drawMarketData();
+      openOrder(1);
     } else if (mouseX >= 251 && mouseX <= 449 && mouseY >= 40 && mouseY <= 160 || mouseX >= 0 && mouseX <= 150 && mouseY >= 0 && mouseY <= 39) {  //when ask is pressed = buy
-
-      //margin is enough or not
-      if (equity - (margin_sum + (ask * lot * lot_size / leverage)) < 0) {
-        textAlign(LEFT, BOTTOM);
-        fill(230, 0, 0);
-        noStroke();
-        text("WARING: " + "margin isn't enough ", 200, 860);
-        fill(255);
-        return;
-      }
-
-      in_price[num_order] = ask;
-      margins[num_order] = ask * lot * lot_size / leverage;
-      BoS[num_order] = 2;
-      lots[num_order] = lot;
-      num_order ++;
-      drawLayout();
-      drawMarketData();
+      openOrder(2);
     }
   }
 
   //when position closed
   if (mouseX >= 1700 && mouseX <= width && mouseY >= 860 && mouseY <= 889) {
-    for (int i = 0; i <= 4; i++) {
-      balance    += float_profits[i];
-      in_price[i] = in_price[i + 1];
-      margins[i]  = margins[i + 1];
-      BoS[i]      = BoS[i + 1];
-      lots[i]     = lots[i + 1];
-      float_profits[i] = 0;
-    }
-    num_order --;
-    drawLayout();
-    drawMarketData();
+    closeOrder(0);
   } else if (mouseX >= 1700 && mouseX <= width && mouseY >= 891 && mouseY <= 919) {
-    for (int i = 1; i <= 4; i++) {
-      balance    += float_profits[i];
-      in_price[i] = in_price[i + 1];
-      margins[i]  = margins[i + 1];
-      BoS[i]      = BoS[i + 1];
-      lots[i]     = lots[i + 1];
-      float_profits[i] = 0;
-    }
-    num_order --;
-    drawLayout();
-    drawMarketData();
+    closeOrder(1);
   } else if (mouseX >= 1700 && mouseX <= width && mouseY >= 921 && mouseY <= 949) {
-    for (int i = 2; i <= 4; i++) {
-      balance    += float_profits[i];
-      in_price[i] = in_price[i + 1];
-      margins[i]  = margins[i + 1];
-      BoS[i]      = BoS[i + 1];
-      lots[i]     = lots[i + 1];
-      float_profits[i] = 0;
-    }
-    num_order --;
-    drawLayout();
-    drawMarketData();
+    closeOrder(2);
   } else if (mouseX >= 1700 && mouseX <= width && mouseY >= 951 && mouseY <= 979) {
-    for (int i = 3; i <= 4; i++) {
-      balance    += float_profits[i];
-      in_price[i] = in_price[i + 1];
-      margins[i]  = margins[i + 1];
-      BoS[i]      = BoS[i + 1];
-      lots[i]     = lots[i + 1];
-      float_profits[i] = 0;
-    }
-    num_order --;
-    drawLayout();
-    drawMarketData();
+    closeOrder(3);
   } else if (mouseX >= 1700 && mouseX <= width && mouseY >= 981 && mouseY <= height) {
-    for (int i = 4; i <= 4; i++) {
-      balance    += float_profits[i];
-      in_price[i] = in_price[i + 1];
-      margins[i]  = margins[i + 1];
-      BoS[i]      = BoS[i + 1];
-      lots[i]     = lots[i + 1];
-      float_profits[i] = 0;
-    }
-    num_order --;
-    drawLayout();
-    drawMarketData();
+    closeOrder(4);
   }
   //when position closed
 
   //when lot changed
-  if (mouseX >= 501 && mouseX <= 574 && mouseY >= 41 && mouseY <= 79) {   //when +1 pressed
+  if (mouseX >= 501 && mouseX <= 574 && mouseY >= 41 && mouseY <= 79) {             //when +1 pressed
     changeLot(1);
-  } else if (mouseX >= 501 && mouseX <= 574 && mouseY >= 81 && mouseY <= 119) {  //when +0.1 pressed
+  } else if (mouseX >= 501 && mouseX <= 574 && mouseY >= 81 && mouseY <= 119) {     //when +0.1 pressed
     changeLot(0.1);
-  } else if (mouseX >= 501 && mouseX <= 574 && mouseY >= 121 && mouseY <= 159) {  //when +0.01 pressed
+  } else if (mouseX >= 501 && mouseX <= 574 && mouseY >= 121 && mouseY <= 159) {    //when +0.01 pressed
     changeLot(0.01);
   }
 
   if (lot > 0) {
-    if (mouseX >= 576 && mouseX <= 749 && mouseY >= 41 && mouseY <= 79) {   //when -1 pressed
+    if (mouseX >= 576 && mouseX <= 749 && mouseY >= 41 && mouseY <= 79) {             //when -1 pressed
       changeLot(-1);
-    } else if (mouseX >= 576 && mouseX <= 749 && mouseY >= 81 && mouseY <= 119) {  //when -0.1 pressed
+    } else if (mouseX >= 576 && mouseX <= 749 && mouseY >= 81 && mouseY <= 119) {     //when -0.1 pressed
       changeLot(-0.1);
-    } else if (mouseX >= 576 && mouseX <= 749 && mouseY >= 121 && mouseY <= 159) {  //when -0.01 pressed
+    } else if (mouseX >= 576 && mouseX <= 749 && mouseY >= 121 && mouseY <= 159) {    //when -0.01 pressed
       changeLot(-0.01);
     }
   }
   //when lot changed
 }
 
+
+void openOrder(int orderType) { //orderType = buy or sell, 1 = sell, 2 = buy
+  float margin_sum = 0;
+  float neededMargin = 0;
+
+  if (orderType == 1) {
+    neededMargin = bid * lot * lot_size / leverage;
+  } else if (orderType == 2) {
+    neededMargin = ask * lot * lot_size / leverage;
+  }
+
+  for (int i = 0; i <= margins.length - 1; i++) {
+    margin_sum += margins[i];
+  }
+
+  //margin is enough or not
+  if (equity - (margin_sum + neededMargin) < 0) {
+    textAlign(LEFT, BOTTOM);
+    fill(230, 0, 0);
+    noStroke();
+    text("WARING: " + "margin isn't enough ", 200, 860);
+    fill(255);
+    return;
+  }
+
+  if (orderType == 1) {
+    in_price[num_order] = bid;
+    BoS[num_order] = 1;
+  } else if (orderType == 2) {
+    in_price[num_order] = ask;
+    BoS[num_order] = 2;
+  }
+
+  margins[num_order] = neededMargin;
+  lots[num_order] = lot;
+  num_order ++;
+  drawLayout();
+  drawMarketData();
+}
+
+void closeOrder(int idx) {
+  for (int i = idx; i <= 4; i++) {
+    balance    += float_profits[i];
+    in_price[i] = in_price[i + 1];
+    margins[i]  = margins[i + 1];
+    BoS[i]      = BoS[i + 1];
+    lots[i]     = lots[i + 1];
+    float_profits[i] = 0;
+  }
+  num_order --;
+  drawLayout();
+  drawMarketData();
+}
 
 void changeLot(float change) {
   lot = lot + change;
