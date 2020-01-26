@@ -1,0 +1,22 @@
+<script src="processing.js"></script>
+<script type="text/processing" data-processing-target="processing-canvas">
+/*@pjs preload="./askOpens.txt, ./askHighs.txt, ./askLows.txt, ./askCloses.txt, ./bidOpens.txt, ./bidHighs.txt, ./bidLows.txt, ./bidCloses.txt";*/
+
+  String[] as;
+void setup() {
+  size(500,500);
+  as = loadStrings("./askOpens.txt");
+  noLoop();
+}
+
+void draw() {
+background(0);
+  text(as[1], 250, 250);
+}
+
+void mouseClicked() {
+  ellipse(mouseX, mouseY, 50, 50);
+}
+ 
+</script>
+<canvas id="processing-canvas"></canvas>
